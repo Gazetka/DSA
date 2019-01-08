@@ -1,6 +1,12 @@
 package crypto3;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -14,7 +20,7 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
-
+import crypto3.load_the_file;
 
 public class DSA {
 	
@@ -22,6 +28,7 @@ public class DSA {
 	
 		//  path = Paths.get(FILE_NAME);
 		//	bytes = Files.readAllBytes(path);
+
 		
 		KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA");
 	    kpg.initialize(1024);
@@ -42,18 +49,51 @@ public class DSA {
 	    System.out.println("\nq = " + dsaPubKeySpec.getQ());
 	    System.out.println("\ny = " + dsaPubKeySpec.getY());
 	    
-		Signature signature = Signature.getInstance("SHA1withDSA");
-		signature.initSign(priKey, new SecureRandom());
+	    //zapis privkey do pliku
+	    byte[] privkey = priKey.getEncoded();
+		FileOutputStream keypriv = new FileOutputStream("C:\\Users\\cp24\\Desktop\\keypriv.txt");
+		keypriv.write(privkey);
+		keypriv.close();
+		//zapis pubkey do pliku
+		byte[] key = pubKey.getEncoded();
+		FileOutputStream keypub = new FileOutputStream("C:\\Users\\cp24\\Desktop\\keypub.txt");
+		keypub.write(key);
+		keypub.close();		
+	    
+		Signature signature = Signature.getInstance("SHA1withDSA","SUN");
+		signature.initSign(priKey);
 		
-		 Scanner in = new Scanner(System.in);
-		 System.out.println("\n Podaj tekst do podpisu: ");
-		 String tekst = in.nextLine();
+		//signature.initSign(priKey, new SecureRandom());
+		
+		//podpisanie pliku
+		FileInputStream fis = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
+		BufferedInputStream bufin = new BufferedInputStream(fis);
+		byte[] buffer = new byte[1024];
+		int len;
+		while ((len = bufin.read(buffer)) >= 0) {
+			signature.update(buffer, 0, len);
+		};
+		bufin.close();
+		
+		byte[] realSig = signature.sign();
+		
+		FileOutputStream filesignature = new FileOutputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
+		filesignature.write(realSig);
+		filesignature.close();
+		
+		
+		/// Scanner in = new Scanner(System.in);
+		// System.out.println("\n Podaj tekst do podpisu: ");
+		// String tekst = in.nextLine();
 		//podpis prywatnym
-		byte[] message = tekst.getBytes();
-	    signature.update(message);
-		byte[] sigBytes = signature.sign();
+	//	byte[] message = tekst.getBytes();
+	  //  signature.update(message);
+	//	byte[] sigBytes = signature.sign();
 		
-		
+
+		//System.out.println("------------------\n");
+
+
 		/*
 		 * Pomocny komentarz do tego co trzeba zrobiæ, czyli czytaæ dokumentacjê.
 		 * 
@@ -74,20 +114,25 @@ public class DSA {
 		
 		//Andrzeja 
 		
-		System.out.println("------------------\n");
+
 		
-		byte[] key = pubKey.getEncoded();
+
+
+		//BigInteger b1= new BigInteger(key);
 		
-		BigInteger b1= new BigInteger(key);
+		//byte[] key1 = b1.toByteArray();
 		
-		byte[] key1 = b1.toByteArray();
+		//BigInteger b2= new BigInteger(key1);
 		
-		BigInteger b2= new BigInteger(key1);
-		
-		System.out.println(b1 + "\n");
-		System.out.println(b2);
+		//System.out.println(b1 + "\n");
+		//System.out.println(b2);
 		
 		
+			
+		load_the_file rfile = new load_the_file();
+		rfile.file();
+		
+
 		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
 		
 		KeyFactory keyFactory = KeyFactory.getInstance("DSA");
@@ -100,33 +145,19 @@ public class DSA {
 		
 	    System.out.println("\n DSA Public Key");
 	    System.out.println("\ng = " + dsaPubKeySpec1.getG());
-	    System.out.println("\np = " + dsaPubKeySpec1.getP());
+		System.out.println("\np = " + dsaPubKeySpec1.getP());
 	    System.out.println("\nq = " + dsaPubKeySpec1.getQ());
 	    System.out.println("\ny = " + dsaPubKeySpec1.getY());
+	    
+	    
+	    // weryfikacja na podstawie https://docs.oracle.com/javase/tutorial/security/apisign/versig.html
 		
 		signature.initVerify(pubKey);
-		signature.update(message);
-		System.out.println("\n"+ signature.verify(sigBytes));
+		signature.update(realSig);
+		System.out.println("\n"+ signature.verify(realSig));
 		
 		
-		/*
-		System.out.println("Podaj klucz publiczny ");
-		
-		String y = in.nextLine();
-		BigInteger b1= new BigInteger(y);
-		
-		if(b1==dsaPubKeySpec.getY())
-		{
-			signature.initVerify(keypair.getPublic());  
-			signature.update(message);
-			System.out.println("\n"+ signature.verify(sigBytes));
-		}
-		
-		else {
-			System.out.println(" niepoprawny klucz publiczny");
-		 }  
-		*/
-		
-	    }
 
 }
+}
+		
