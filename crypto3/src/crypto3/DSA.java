@@ -20,7 +20,8 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
-import crypto3.load_the_file;
+import crypto3.DSAVerify;
+
 
 public class DSA {
 	
@@ -76,11 +77,13 @@ public class DSA {
 		bufin.close();
 		
 		byte[] realSig = signature.sign();
-		
-		FileOutputStream filesignature = new FileOutputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
+		//zapisanie pliku z podpisem
+		FileOutputStream filesignature = new FileOutputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
 		filesignature.write(realSig);
 		filesignature.close();
 		
+		DSAVerify dsaV = new DSAVerify();
+		dsaV.verify();
 		
 		/// Scanner in = new Scanner(System.in);
 		// System.out.println("\n Podaj tekst do podpisu: ");
@@ -129,10 +132,10 @@ public class DSA {
 		
 		
 			
-		load_the_file rfile = new load_the_file();
-		rfile.file();
+	//	DSAVerify rfile = new DSAVerify();
+	//	rfile.file();
 		
-
+ /*
 		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
 		
 		KeyFactory keyFactory = KeyFactory.getInstance("DSA");
@@ -149,15 +152,15 @@ public class DSA {
 	    System.out.println("\nq = " + dsaPubKeySpec1.getQ());
 	    System.out.println("\ny = " + dsaPubKeySpec1.getY());
 	    
-	    
+	*/    
 	    // weryfikacja na podstawie https://docs.oracle.com/javase/tutorial/security/apisign/versig.html
 		
-		signature.initVerify(pubKey);
-		signature.update(realSig);
-		System.out.println("\n"+ signature.verify(realSig));
+	//	signature.initVerify(pubKey);
+	//	signature.update(realSig);
+	//	System.out.println("\n"+ signature.verify(realSig));
 		
 		
 
-}
+	}
 }
 		
