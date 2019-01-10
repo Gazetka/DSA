@@ -10,10 +10,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-//import com.sun.javafx.iio.ImageFormatDescription.Signature;
+//import com.sun.javafx.iio.ImageFormatDescription.Signature; /* z ta bibliotek¹ jak wykomentuje siê ostatnia bibliotekê to podkreœnia na czerwono*/
 import java.math.BigInteger;
-import java.security.Signature;
+import java.security.Signature;  /* tutaj nie podkresla, ale nie mooge u¿yæ tej wykomentowanej*/ 
+
+/* https://docs.oracle.com/javase/tutorial/security/apisign/versig.html*/
 
 public class DSAVerify {
 	
@@ -28,31 +31,30 @@ public class DSAVerify {
         keyfis.close();
 
         KeyFactory kf = KeyFactory.getInstance("DSA");
-       
         X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
-		
 		KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-		
 		PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-	
 		DSAPublicKeySpec dsaPubKeySpec1 = (DSAPublicKeySpec)kf.getKeySpec(pubKey,DSAPublicKeySpec.class);
-		
+		/* Sprawdzenie czy to samo */
 		System.out.println("\n DSA Public Key sprawdzenie");
 		System.out.println("\ng = " + dsaPubKeySpec1.getG());
 		System.out.println("\np = " + dsaPubKeySpec1.getP());
 		System.out.println("\nq = " + dsaPubKeySpec1.getQ());
 		System.out.println("\ny = " + dsaPubKeySpec1.getY());
-		 
+		
+		
+		/* Wczytanie podpisanej wiadomosci*/ 
         FileInputStream sigfile = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
         byte[] sigToVerify = new byte[sigfile.available()]; 
         sigfile.read(sigToVerify);
         sigfile.close();
 
+		
        
         Signature signature = Signature.getInstance("SHA1withDSA", "SUN");
         signature.initVerify(pubKey);
 
-      
+      /* Wetfikacja pliku */
 
         FileInputStream datafiles = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
         BufferedInputStream bufin = new BufferedInputStream(datafiles);

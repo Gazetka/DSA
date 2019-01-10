@@ -1,6 +1,7 @@
 package crypto3;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
@@ -18,6 +19,7 @@ import java.security.Signature;
 import java.security.spec.DSAPrivateKeySpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
 import crypto3.DSAVerify;
@@ -55,16 +57,37 @@ public class DSA {
 		FileOutputStream keypriv = new FileOutputStream("C:\\Users\\cp24\\Desktop\\keypriv.txt");
 		keypriv.write(privkey);
 		keypriv.close();
+		
+		
 		//zapis pubkey do pliku
 		byte[] key = pubKey.getEncoded();
 		FileOutputStream keypub = new FileOutputStream("C:\\Users\\cp24\\Desktop\\keypub.txt");
 		keypub.write(key);
 		keypub.close();		
-	    
-		Signature signature = Signature.getInstance("SHA1withDSA","SUN");
-		signature.initSign(priKey);
 		
-		//signature.initSign(priKey, new SecureRandom());
+		
+		/* Wczytanie klucza prywatnego z pliku*/
+		File filePrivateKey = new File("C:\\Users\\cp24\\Desktop\\keypriv.txt");
+		FileInputStream fileprivkey = new FileInputStream("C:\\Users\\cp24\\Desktop\\keypriv.txt");
+		byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
+		fileprivkey.read(encodedPrivateKey);
+		fileprivkey.close();
+		
+		PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+		KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+		PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+		DSAPrivateKeySpec dsaPriKeySpec1 = (DSAPrivateKeySpec) kf.getKeySpec(privateKey,DSAPrivateKeySpec.class);
+		
+		/* Sprawdzenie klucza prywatnego z pliku - czy to samo*/
+		System.out.println("\n DSA Private Key sprawdzenie");
+		System.out.println("\nx = " + dsaPriKeySpec1.getX());
+	    
+		
+		
+		Signature signature = Signature.getInstance("SHA1withDSA","SUN");
+		signature.initSign(privateKey);
+		
+		
 		
 		//podpisanie pliku
 		FileInputStream fis = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
@@ -75,8 +98,8 @@ public class DSA {
 			signature.update(buffer, 0, len);
 		};
 		bufin.close();
-		
 		byte[] realSig = signature.sign();
+		
 		//zapisanie pliku z podpisem
 		FileOutputStream filesignature = new FileOutputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
 		filesignature.write(realSig);
