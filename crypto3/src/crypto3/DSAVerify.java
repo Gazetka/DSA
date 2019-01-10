@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -23,8 +25,14 @@ public class DSAVerify {
 	public void verify () throws  NoSuchAlgorithmException,Exception, InvalidKeySpecException  {
 		
 
+		String FILE_NAME = "C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf";
+		Path path;
+		path = Paths.get(FILE_NAME);
+		byte[] sigBytes;
+		sigBytes=Files.readAllBytes(path);
+		
+		
 		// wziêcie klucza publicznego z pliku
-
         FileInputStream keyfis = new FileInputStream("C:\\Users\\cp24\\Desktop\\keypub.txt");
         byte[] encKey = new byte[keyfis.available()];  
         keyfis.read(encKey);
@@ -44,34 +52,38 @@ public class DSAVerify {
 		
 		
 		/* Wczytanie podpisanej wiadomosci*/ 
-        FileInputStream sigfile = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
-        byte[] sigToVerify = new byte[sigfile.available()]; 
-        sigfile.read(sigToVerify);
-        sigfile.close();
+       // FileInputStream sigfile = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
+       // byte[] sigToVerify = new byte[sigfile.available()]; 
+       // sigfile.read(sigToVerify);
+       // sigfile.close();
 
 		
        
         Signature signature = Signature.getInstance("SHA1withDSA", "SUN");
+        
         signature.initVerify(pubKey);
-
+        signature.update(sigBytes);
+    	System.out.println("\n"+ signature.verify(sigBytes));
+    	Files.write(path, sigBytes);
+        
       /* Wetfikacja pliku */
 
-        FileInputStream datafiles = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
-        BufferedInputStream bufin = new BufferedInputStream(datafiles);
+      //  FileInputStream datafiles = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
+      //  BufferedInputStream bufin = new BufferedInputStream(datafiles);
 
-        byte[] buffer = new byte[1024];
-        int len;
-        while (bufin.available() != 0) {
-            len = bufin.read(buffer);
-            signature.update(buffer, 0, len);
-            };
+      //  byte[] buffer = new byte[1024];
+      //  int len;
+     //   while (bufin.available() != 0) {
+       //     len = bufin.read(buffer);
+       //     signature.update(buffer, 0, len);
+        //    };
 
-        bufin.close();
+       // bufin.close();
 
 
-        boolean verifies = signature.verify(sigToVerify);
+       // boolean verifies = signature.verify(sigToVerify);
 
-        System.out.println("\n signature verifies: " + verifies);
+       // System.out.println("\n signature verifies: " + verifies);
 		
 		
 	   

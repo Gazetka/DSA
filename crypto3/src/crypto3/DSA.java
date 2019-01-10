@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,11 +28,15 @@ import crypto3.DSAVerify;
 
 public class DSA {
 	
-	public static void main(String[] args) throws NoSuchAlgorithmException,Exception, InvalidKeySpecException {
+	public static void main(String[] args) throws NoSuchAlgorithmException,Exception, InvalidKeySpecException,IOException {
 	
 		//  path = Paths.get(FILE_NAME);
 		//	bytes = Files.readAllBytes(path);
-
+		String FILE_NAME = "C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf";
+		Path path;
+		path = Paths.get(FILE_NAME);
+		byte[] bytes=Files.readAllBytes(path);
+		//bytes = Files.readAllBytes(path);
 		
 		KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA");
 	    kpg.initialize(1024);
@@ -88,22 +93,25 @@ public class DSA {
 		signature.initSign(privateKey);
 		
 		
+		signature.update(bytes);
+		byte[] sigBytes = signature.sign();
+		Files.write(path, sigBytes);
 		
 		//podpisanie pliku
-		FileInputStream fis = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
-		BufferedInputStream bufin = new BufferedInputStream(fis);
-		byte[] buffer = new byte[1024];
-		int len;
-		while ((len = bufin.read(buffer)) >= 0) {
-			signature.update(buffer, 0, len);
-		};
-		bufin.close();
-		byte[] realSig = signature.sign();
+		//FileInputStream fis = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
+	//	BufferedInputStream bufin = new BufferedInputStream(fis);
+	//	byte[] buffer = bytes;
+	//	int len;
+	//	while ((len = bufin.read(buffer)) >= 0) {
+	//		signature.update(buffer, 0, len);
+	//	};
+	//	bufin.close();
+	//	byte[] realSig = signature.sign();
 		
 		//zapisanie pliku z podpisem
-		FileOutputStream filesignature = new FileOutputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
-		filesignature.write(realSig);
-		filesignature.close();
+		//FileOutputStream Files = new FileOutputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc_podpisana.pdf");
+		//Files.write(path, bytes);
+		//Files.clone();
 		
 		DSAVerify dsaV = new DSAVerify();
 		dsaV.verify();
