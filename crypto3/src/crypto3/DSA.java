@@ -30,19 +30,33 @@ public class DSA {
 	
 	public static void main(String[] args) throws NoSuchAlgorithmException,Exception, InvalidKeySpecException,IOException {
 	
-		//  path = Paths.get(FILE_NAME);
-		//	bytes = Files.readAllBytes(path);
-		String FILE_NAME = "C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf";
-		Path path;
-		path = Paths.get(FILE_NAME);
-		byte[] bytes=Files.readAllBytes(path);
-		//bytes = Files.readAllBytes(path);
 		
-		KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA");
-	    kpg.initialize(1024);
+		//Wczytanie pliku do podpisu
+		String FILE_NAME = "C:\\TEMP\\1.txt";
+		String FILE_NAME1 = "C:\\TEMP\\1_1.txt";
+		Path path = Paths.get(FILE_NAME);
+		Path path1 = Paths.get(FILE_NAME1);
+		byte[] bytes=Files.readAllBytes(path);
+		
+		
+		//Inicjalizacja kluczy
+		KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", "SUN");
+		
+		SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+		kpg.initialize(1024, random);
+	
 	    KeyPair keypair = kpg.genKeyPair();
 	    PrivateKey priKey = keypair.getPrivate();
 	    PublicKey pubKey = keypair.getPublic();
+	    
+		byte[] key = pubKey.getEncoded();
+		FileOutputStream keypub = new FileOutputStream("C:\\TEMP\\keypub");
+		keypub.write(key);
+		keypub.close();		
+	    
+	    
+	    
+	    /*
 	    KeyFactory kf = KeyFactory.getInstance("DSA");
 	    DSAPrivateKeySpec dsaPriKeySpec = (DSAPrivateKeySpec) kf.getKeySpec(priKey,DSAPrivateKeySpec.class);
 	    DSAPublicKeySpec dsaPubKeySpec = (DSAPublicKeySpec) kf.getKeySpec(pubKey,DSAPublicKeySpec.class);
@@ -59,21 +73,19 @@ public class DSA {
 	    
 	    //zapis privkey do pliku
 	    byte[] privkey = priKey.getEncoded();
-		FileOutputStream keypriv = new FileOutputStream("C:\\Users\\cp24\\Desktop\\keypriv.txt");
+		FileOutputStream keypriv = new FileOutputStream("C:\\TEMP\\keypriv.txt");
 		keypriv.write(privkey);
 		keypriv.close();
 		
-		
 		//zapis pubkey do pliku
 		byte[] key = pubKey.getEncoded();
-		FileOutputStream keypub = new FileOutputStream("C:\\Users\\cp24\\Desktop\\keypub.txt");
+		FileOutputStream keypub = new FileOutputStream("C:\\TEMP\\keypub.txt");
 		keypub.write(key);
 		keypub.close();		
 		
-		
-		/* Wczytanie klucza prywatnego z pliku*/
-		File filePrivateKey = new File("C:\\Users\\cp24\\Desktop\\keypriv.txt");
-		FileInputStream fileprivkey = new FileInputStream("C:\\Users\\cp24\\Desktop\\keypriv.txt");
+		// Wczytanie klucza prywatnego z pliku
+		File filePrivateKey = new File("C:\\TEMP\\keypriv.txt");
+		FileInputStream fileprivkey = new FileInputStream("C:\\TEMP\\keypriv.txt");
 		byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
 		fileprivkey.read(encodedPrivateKey);
 		fileprivkey.close();
@@ -83,19 +95,17 @@ public class DSA {
 		PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
 		DSAPrivateKeySpec dsaPriKeySpec1 = (DSAPrivateKeySpec) kf.getKeySpec(privateKey,DSAPrivateKeySpec.class);
 		
-		/* Sprawdzenie klucza prywatnego z pliku - czy to samo*/
+		// Sprawdzenie klucza prywatnego z pliku - czy to samo
 		System.out.println("\n DSA Private Key sprawdzenie");
 		System.out.println("\nx = " + dsaPriKeySpec1.getX());
-	    
+	    */
 		
 		
 		Signature signature = Signature.getInstance("SHA1withDSA","SUN");
-		signature.initSign(privateKey);
-		
-		
+		signature.initSign(priKey);
 		signature.update(bytes);
 		byte[] sigBytes = signature.sign();
-		Files.write(path, sigBytes);
+		Files.write(path1, sigBytes);
 		
 		//podpisanie pliku
 		//FileInputStream fis = new FileInputStream("C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf");
@@ -113,8 +123,8 @@ public class DSA {
 		//Files.write(path, bytes);
 		//Files.clone();
 		
-		DSAVerify dsaV = new DSAVerify();
-		dsaV.verify();
+	//	DSAVerify dsaV = new DSAVerify();
+	//	dsaV.verify();
 		
 		/// Scanner in = new Scanner(System.in);
 		// System.out.println("\n Podaj tekst do podpisu: ");
@@ -163,8 +173,10 @@ public class DSA {
 		
 		
 			
-	//	DSAVerify rfile = new DSAVerify();
-	//	rfile.file();
+		DSAVerify rfile = new DSAVerify();
+		rfile.verify();
+		
+		// rfile.file();
 		
  /*
 		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);

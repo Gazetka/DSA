@@ -25,30 +25,40 @@ public class DSAVerify {
 	public void verify () throws  NoSuchAlgorithmException,Exception, InvalidKeySpecException  {
 		
 
-		String FILE_NAME = "C:\\Users\\cp24\\Desktop\\Wiadomosc.pdf";
+		String FILE_NAME = "C:\\TEMP\\1_1.txt";
 		Path path;
 		path = Paths.get(FILE_NAME);
 		byte[] sigBytes;
 		sigBytes=Files.readAllBytes(path);
 		
+		String FILE_NAME1 = "C:\\TEMP\\1.txt";
+		Path path1;
+		path1 = Paths.get(FILE_NAME1);
+		byte[] sigBytes1 = null;
+		sigBytes1=Files.readAllBytes(path1);
+		
 		
 		// wziêcie klucza publicznego z pliku
-        FileInputStream keyfis = new FileInputStream("C:\\Users\\cp24\\Desktop\\keypub.txt");
+        FileInputStream keyfis = new FileInputStream("C:\\TEMP\\keypub");
         byte[] encKey = new byte[keyfis.available()];  
         keyfis.read(encKey);
         keyfis.close();
 
-        KeyFactory kf = KeyFactory.getInstance("DSA");
         X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
-		KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-		PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-		DSAPublicKeySpec dsaPubKeySpec1 = (DSAPublicKeySpec)kf.getKeySpec(pubKey,DSAPublicKeySpec.class);
+        KeyFactory kf = KeyFactory.getInstance("DSA", "SUN");
+        PublicKey pubKey = kf.generatePublic(pubKeySpec);
+        
+		
+       // KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+		
+		//PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+		//DSAPublicKeySpec dsaPubKeySpec1 = (DSAPublicKeySpec)kf.getKeySpec(pubKey,DSAPublicKeySpec.class);
 		/* Sprawdzenie czy to samo */
-		System.out.println("\n DSA Public Key sprawdzenie");
-		System.out.println("\ng = " + dsaPubKeySpec1.getG());
-		System.out.println("\np = " + dsaPubKeySpec1.getP());
-		System.out.println("\nq = " + dsaPubKeySpec1.getQ());
-		System.out.println("\ny = " + dsaPubKeySpec1.getY());
+		//System.out.println("\n DSA Public Key sprawdzenie");
+		//System.out.println("\ng = " + dsaPubKeySpec1.getG());
+		//System.out.println("\np = " + dsaPubKeySpec1.getP());
+		//System.out.println("\nq = " + dsaPubKeySpec1.getQ());
+		//System.out.println("\ny = " + dsaPubKeySpec1.getY());
 		
 		
 		/* Wczytanie podpisanej wiadomosci*/ 
@@ -57,13 +67,13 @@ public class DSAVerify {
        // sigfile.read(sigToVerify);
        // sigfile.close();
 
-		
-       
+	
         Signature signature = Signature.getInstance("SHA1withDSA", "SUN");
-        
         signature.initVerify(pubKey);
-        signature.update(sigBytes);
-    	System.out.println("\n"+ signature.verify(sigBytes));
+        signature.update(sigBytes1);
+        
+    	System.out.println(signature.verify(sigBytes));
+    	
     	Files.write(path, sigBytes);
         
       /* Wetfikacja pliku */
